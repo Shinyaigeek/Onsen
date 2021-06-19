@@ -3,6 +3,7 @@ use super::value::{free_value_array, Value, ValueArray};
 
 pub const OP_CONSTANT: u8 = 0;
 pub const OP_RETURN: u8 = 1;
+pub const OP_NEGATIVE: u8 = 2;
 
 pub type OperationCode = u8;
 
@@ -109,6 +110,9 @@ impl Chunk {
             }
             &OP_CONSTANT => {
                 self.constant_instruction("OP_CONSTANT", offset);
+            }
+            &OP_NEGATIVE => {
+                Self::simple_instruction("OP_NEGATIVE", offset);
             }
             _ => {
                 panic!("unknown operation code {:?}", instruction);

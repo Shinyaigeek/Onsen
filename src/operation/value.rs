@@ -1,7 +1,6 @@
 use super::util::{grow_array, grow_capacity};
 
 pub type Value = f64;
-
 pub struct ValueArray {
     pub count: usize,
     capacity: usize,

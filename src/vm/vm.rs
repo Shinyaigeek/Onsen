@@ -44,6 +44,11 @@ impl VM {
                 Some(chunk) => chunk,
                 None => panic!("[run]run is invoked with self.chunk is none"),
             };
+            print!("          ");
+            for slot in &self.stack {
+                print!("[ {:?} ]", slot);
+            }
+            println!("");
             chunk.disassemble_instruction(&mut self.ip_idx.clone());
 
             let byte = match &self.ip {
@@ -51,12 +56,19 @@ impl VM {
                 None => panic!("[run]run is invoked with self.ip is none"),
             };
             match byte {
-                OP_RETURN => return InterpretResult::INTERPRET_OK,
+                OP_RETURN => {
+                    ValueArray::print_value(self.pop_stack());
+                    println!("");
+                    return InterpretResult::INTERPRET_OK;
+                }
 
                 OP_CONSTANT => {
                     let constant = self.read_constants();
-                    ValueArray::print_value(constant);
-                    println!("");
+                    self.push_stack(constant);
+                }
+                OP_NEGATIVE => {
+                    let value = self.pop_stack();
+                    self.push_stack((-1 as f64) * value);
                 }
                 _ => {
                     panic!("unknown operation code {:?}", byte);
