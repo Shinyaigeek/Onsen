@@ -1,12 +1,17 @@
 use crate::operation::op::{Chunk, OP_CONSTANT, OP_RETURN};
 use crate::operation::value::{Value, ValueArray};
 
+const STACK_MAX: usize = 256;
+
 pub struct VM {
     chunk: Option<Chunk>,
 
-    // actual, this is not ip?
+    // TODO actual, this is not ip? this should be pointer
     ip: Option<Vec<u8>>,
     ip_idx: usize,
+    stack: Vec<Value>,
+    // TODO this should be pointer
+    stack_top_idx: usize,
 }
 
 impl VM {
@@ -15,7 +20,12 @@ impl VM {
             chunk: None,
             ip: None,
             ip_idx: 0,
+            stack: Vec::with_capacity(STACK_MAX),
+            stack_top_idx: 0,
         }
+    }
+    pub fn init(&mut self) {
+        self.reset_stack();
     }
     pub fn interpret(&mut self, chunk: Chunk) -> InterpretResult {
         let code = chunk.code.clone();
@@ -54,6 +64,24 @@ impl VM {
             }
 
             self.ip_idx += 1;
+        }
+    }
+
+    fn reset_stack(&mut self) {
+        self.stack.clear();
+        self.stack_top_idx = 0;
+    }
+
+    fn push_stack(&mut self, value: Value) {
+        self.stack_top_idx += 1;
+        self.stack.push(value);
+    }
+
+    fn pop_stack(&mut self) -> Value {
+        self.stack_top_idx -= 1;
+        match self.stack.pop() {
+            Some(v) => v,
+            None => panic!("[pop_stack] vm.pop_stack is called when stack does not have any value"),
         }
     }
 
