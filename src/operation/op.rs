@@ -1,5 +1,5 @@
 use super::util::{grow_array, grow_capacity};
-use super::value::{ValueArray, free_value_array};
+use super::value::{free_value_array, Value, ValueArray};
 
 const OP_RETURN: &str = "OP_RETURN";
 
@@ -15,7 +15,7 @@ pub struct Chunk {
     count: usize,
     // the number of elements in the array we have allocated
     capacity: usize,
-    constants: ValueArray
+    constants: ValueArray,
 }
 
 impl Chunk {
@@ -24,7 +24,7 @@ impl Chunk {
             code: Vec::with_capacity(0),
             count: 0,
             capacity: 0,
-            constants: ValueArray::new()
+            constants: ValueArray::new(),
         }
     }
 
@@ -42,6 +42,11 @@ impl Chunk {
 
         self.code.push(bytes);
         self.count += 1;
+    }
+
+    pub fn add_constants(&mut self, value: Value) -> usize {
+        self.constants.write(value);
+        self.constants.count - 1
     }
 
     pub fn disassemble(&self, name: &str) {

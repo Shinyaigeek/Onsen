@@ -1,9 +1,9 @@
 use super::util::{grow_array, grow_capacity};
 
-type Value = f64;
+pub type Value = f64;
 
 pub struct ValueArray {
-    count: usize,
+    pub count: usize,
     capacity: usize,
     values: Vec<Value>,
 }
