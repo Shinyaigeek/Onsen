@@ -1,12 +1,10 @@
 use super::util::{grow_array, grow_capacity};
 use super::value::{free_value_array, Value, ValueArray};
 
-const OP_RETURN: &str = "OP_RETURN";
+pub const OP_CONSTANT: u8 = 0;
+pub const OP_RETURN: u8 = 1;
 
-#[derive(Clone, Debug)]
-pub enum OperationCode {
-    OP_RETURN,
-}
+pub type OperationCode = u8;
 
 pub struct Chunk {
     // instruction, and other data
@@ -44,6 +42,7 @@ impl Chunk {
         self.count += 1;
     }
 
+    // After we add the constant, we return the index where the constant was appended so that we can locate that same constant later.
     pub fn add_constants(&mut self, value: Value) -> usize {
         self.constants.write(value);
         self.constants.count - 1
@@ -56,11 +55,11 @@ impl Chunk {
         let mut offset = 0;
 
         while offset < length {
-            self.disassembleInstruction(&mut offset)
+            self.disassemble_instruction(&mut offset)
         }
     }
 
-    fn disassembleInstruction(&self, offset: &mut usize) {
+    fn disassemble_instruction(&self, offset: &mut usize) {
         print!("{}", format!("{:04} ", offset));
 
         // TODO re thinking
@@ -73,8 +72,11 @@ impl Chunk {
         };
 
         match instruction {
-            OperationCode::OP_RETURN => {
-                Self::simpleInstruction(OP_RETURN, offset);
+            &OP_RETURN => {
+                Self::simple_instruction("OP_RETURN", offset);
+            }
+            &OP_CONSTANT => {
+                self.constant_instruction("OP_CONSTANT", offset);
             }
             _ => {
                 panic!("unknown operation code {:?}", instruction);
@@ -83,7 +85,33 @@ impl Chunk {
         }
     }
 
-    fn simpleInstruction(name: &str, offset: &mut usize) {
+    fn constant_instruction(&self, name: &str, offset: &mut usize) {
+        let constant_index = offset.clone() + 1;
+        let constant = self.code.get(constant_index);
+        let constant = match constant {
+            Some(constant) => constant,
+            None => {
+                panic!("there is no constant code at offset {:?}", offset);
+            }
+        };
+
+        println!("{}", format!("{:?} {:04} ", name, constant));
+
+        let value = self.constants.values.get(*constant as usize);
+        let value = match value {
+            Some(value) => value,
+            None => {
+                panic!("there is no value code at constant {:?}", constant);
+            }
+        };
+
+        ValueArray::print_value(*value);
+        println!("");
+        // opcode, operands 2bytes
+        *offset += 2;
+    }
+
+    fn simple_instruction(name: &str, offset: &mut usize) {
         println!("{:?}\n", name);
         *offset += 1;
     }
@@ -104,7 +132,7 @@ mod tests {
         assert_eq!(chunk.capacity, 0);
         assert_eq!(chunk.count, 0);
 
-        chunk.write(OperationCode::OP_RETURN);
+        chunk.write(OP_RETURN);
         assert_eq!(chunk.capacity, 8);
         assert_eq!(chunk.count, 1);
     }

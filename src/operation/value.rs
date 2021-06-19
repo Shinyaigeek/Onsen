@@ -5,7 +5,7 @@ pub type Value = f64;
 pub struct ValueArray {
     pub count: usize,
     capacity: usize,
-    values: Vec<Value>,
+    pub values: Vec<Value>,
 }
 
 impl ValueArray {
@@ -31,6 +31,10 @@ impl ValueArray {
 
         self.values.push(value);
         self.count += 1;
+    }
+
+    pub fn print_value(value: Value) {
+        println!("{:?}", value);
     }
 }
 

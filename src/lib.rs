@@ -1,9 +1,9 @@
-use crate::operation::op::{free_chunk, Chunk, OperationCode};
+use crate::operation::op::{free_chunk, Chunk, OP_RETURN};
 mod operation;
 
 fn assemble() {
     let mut chunk = Chunk::new();
-    chunk.write(OperationCode::OP_RETURN);
+    chunk.write(OP_RETURN);
     chunk.disassemble("test chunk");
     free_chunk(chunk);
 }
