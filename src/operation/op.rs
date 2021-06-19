@@ -8,12 +8,12 @@ pub type OperationCode = u8;
 
 pub struct Chunk {
     // instruction, and other data
-    code: Vec<OperationCode>,
+    pub code: Vec<OperationCode>,
     // how many of those allocated entries are actually in use
     count: usize,
     // the number of elements in the array we have allocated
     capacity: usize,
-    constants: ValueArray,
+    pub constants: ValueArray,
     lines: Vec<usize>,
 }
 

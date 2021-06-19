@@ -6,7 +6,6 @@ pub fn grow_capacity(capacity: usize) -> usize {
     }
 }
 
-// todo should i use vec<T> ?
 pub fn grow_array<T>(array: &mut Vec<T>, new_capacity: usize, old_capacity: usize) -> Vec<T> {
     if new_capacity == 0 {
         return Vec::with_capacity(0);
