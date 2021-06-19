@@ -1,6 +1,8 @@
-#[derive(Clone)]
+const OP_RETURN: &str = "OP_RETURN";
+
+#[derive(Clone, Debug)]
 pub enum OperationCode {
-    OP_RETURN(u8),
+    OP_RETURN,
 }
 
 pub struct Chunk {
@@ -36,6 +38,45 @@ impl Chunk {
 
         self.code.push(bytes);
         self.count += 1;
+    }
+
+    pub fn disassemble(&self, name: &str) {
+        println!("== {:?} ==", name);
+
+        let length = self.count as usize;
+        let mut offset = 0;
+
+        while offset < length {
+            self.disassembleInstruction(&mut offset)
+        }
+    }
+
+    fn disassembleInstruction(&self, offset: &mut usize) {
+        print!("{}", format!("{:04} ", offset));
+
+        // TODO re thinking
+        let instruction = self.code.get(offset.clone());
+        let instruction = match instruction {
+            Some(instruction) => instruction,
+            None => {
+                panic!("there is no operation code at offset {:?}", offset);
+            }
+        };
+
+        match instruction {
+            OperationCode::OP_RETURN => {
+                Self::simpleInstruction(OP_RETURN, offset);
+            }
+            _ => {
+                panic!("unknown operation code {:?}", instruction);
+                *offset += 1;
+            }
+        }
+    }
+
+    fn simpleInstruction(name: &str, offset: &mut usize) {
+        println!("{:?}\n", name);
+        *offset += 1;
     }
 }
 
@@ -78,7 +119,7 @@ mod tests {
         assert_eq!(chunk.capacity, 0);
         assert_eq!(chunk.count, 0);
 
-        chunk.write(OperationCode::OP_RETURN(0));
+        chunk.write(OperationCode::OP_RETURN);
         assert_eq!(chunk.capacity, 8);
         assert_eq!(chunk.count, 1);
     }
