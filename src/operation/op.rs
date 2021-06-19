@@ -1,3 +1,5 @@
+use super::util::{grow_array, grow_capacity};
+
 const OP_RETURN: &str = "OP_RETURN";
 
 #[derive(Clone, Debug)]
@@ -9,10 +11,9 @@ pub struct Chunk {
     // instruction, and other data
     code: Vec<OperationCode>,
     // how many of those allocated entries are actually in use
-    // TODO: usize?
-    count: isize,
+    count: usize,
     // the number of elements in the array we have allocated
-    capacity: isize,
+    capacity: usize,
 }
 
 impl Chunk {
@@ -30,9 +31,9 @@ impl Chunk {
             self.capacity = grow_capacity(self.capacity);
             self.code = grow_array(
                 // TODO fixme, rethink about memory
-                self.code.clone(),
-                self.capacity as usize,
-                old_capacity as usize,
+                &mut self.code,
+                self.capacity,
+                old_capacity,
             );
         }
 
@@ -43,7 +44,7 @@ impl Chunk {
     pub fn disassemble(&self, name: &str) {
         println!("== {:?} ==", name);
 
-        let length = self.count as usize;
+        let length = self.count;
         let mut offset = 0;
 
         while offset < length {
@@ -80,32 +81,7 @@ impl Chunk {
     }
 }
 
-pub fn grow_capacity(capacity: isize) -> isize {
-    if capacity < 8 {
-        8
-    } else {
-        capacity * 2
-    }
-}
-
-// todo should i use vec<T> ?
-pub fn grow_array(
-    array: Vec<OperationCode>,
-    new_capacity: usize,
-    old_capacity: usize,
-) -> Vec<OperationCode> {
-    if new_capacity == 0 {
-        return Vec::with_capacity(0);
-    }
-    if new_capacity < old_capacity {
-        panic!("[grow_array]: panicked because new_capacity < old_capacity");
-    }
-    let mut grown_array: Vec<OperationCode> = array.clone().drain(0..).collect();
-    grown_array.reserve_exact(new_capacity - old_capacity);
-    grown_array
-}
-
-pub fn free(chunk: Chunk) {
+pub fn free_chunk(chunk: Chunk) {
     // do nothing for free Chunk
 }
 
