@@ -93,8 +93,6 @@ impl VM {
                     panic!("unknown operation code {:?}", instruction);
                 }
             }
-
-            self.ip_idx += 1;
         }
     }
 
@@ -118,10 +116,9 @@ impl VM {
 
     fn read_bytes(&mut self) -> u8 {
         let byte = match &self.ip {
-            Some(ip) => ip[self.ip_idx + 1],
+            Some(ip) => ip[self.ip_idx],
             None => panic!("[read_bytes]read_bytes is invoked with self.ip is none"),
         };
-        println!("ip_idx: {:?}", self.ip_idx);
         self.ip_idx += 1;
         byte
     }
