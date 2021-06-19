@@ -1,5 +1,5 @@
 # Onsen
-This is re-implementation v8. bytecode compiler, assembler, optimizer, etc...
+This is re-implementation JavaScript Engine. bytecode compiler, assembler, optimizer, etc...
 
 ## Reference
 
