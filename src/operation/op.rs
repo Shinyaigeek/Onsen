@@ -4,6 +4,10 @@ use super::value::{free_value_array, Value, ValueArray};
 pub const OP_CONSTANT: u8 = 0;
 pub const OP_RETURN: u8 = 1;
 pub const OP_NEGATIVE: u8 = 2;
+pub const OP_ADD: u8 = 3;
+pub const OP_SUBTRACT: u8 = 4;
+pub const OP_MULTIPLY: u8 = 5;
+pub const OP_DIVIDE: u8 = 6;
 
 pub type OperationCode = u8;
 
@@ -113,6 +117,18 @@ impl Chunk {
             }
             &OP_NEGATIVE => {
                 Self::simple_instruction("OP_NEGATIVE", offset);
+            }
+            &OP_ADD => {
+                Self::simple_instruction("OP_ADD", offset);
+            }
+            &OP_SUBTRACT => {
+                Self::simple_instruction("OP_SUBTRACT", offset);
+            }
+            &OP_MULTIPLY => {
+                Self::simple_instruction("OP_MULTIPLY", offset);
+            }
+            &OP_DIVIDE => {
+                Self::simple_instruction("OP_DIVIDE", offset);
             }
             _ => {
                 panic!("unknown operation code {:?}", instruction);

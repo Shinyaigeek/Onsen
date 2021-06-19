@@ -29,6 +29,7 @@ impl VM {
     }
     pub fn interpret(&mut self, chunk: Chunk) -> InterpretResult {
         let code = chunk.code.clone();
+        println!("code: {:?}", code);
         // TODO
         // store the chunk which will be executed by this vm
         self.chunk = Some(chunk);
@@ -51,11 +52,8 @@ impl VM {
             println!("");
             chunk.disassemble_instruction(&mut self.ip_idx.clone());
 
-            let byte = match &self.ip {
-                Some(ip) => ip[self.ip_idx],
-                None => panic!("[run]run is invoked with self.ip is none"),
-            };
-            match byte {
+            let instruction = self.read_bytes();
+            match instruction {
                 OP_RETURN => {
                     ValueArray::print_value(self.pop_stack());
                     println!("");
@@ -70,8 +68,29 @@ impl VM {
                     let value = self.pop_stack();
                     self.push_stack((-1 as f64) * value);
                 }
+                // TODO I want macro
+                OP_ADD => {
+                    let r = self.pop_stack();
+                    let l = self.pop_stack();
+                    self.push_stack(l + r);
+                }
+                OP_SUBTRACT => {
+                    let r = self.pop_stack();
+                    let l = self.pop_stack();
+                    self.push_stack(l - r);
+                }
+                OP_MULTIPLY => {
+                    let r = self.pop_stack();
+                    let l = self.pop_stack();
+                    self.push_stack(l * r);
+                }
+                OP_DIVIDE => {
+                    let r = self.pop_stack();
+                    let l = self.pop_stack();
+                    self.push_stack(l / r);
+                }
                 _ => {
-                    panic!("unknown operation code {:?}", byte);
+                    panic!("unknown operation code {:?}", instruction);
                 }
             }
 
@@ -99,12 +118,12 @@ impl VM {
 
     fn read_bytes(&mut self) -> u8 {
         let byte = match &self.ip {
-            Some(ip) => ip[self.ip_idx],
+            Some(ip) => ip[self.ip_idx + 1],
             None => panic!("[read_bytes]read_bytes is invoked with self.ip is none"),
         };
-        let old_byte = byte.clone();
+        println!("ip_idx: {:?}", self.ip_idx);
         self.ip_idx += 1;
-        old_byte
+        byte
     }
 
     fn read_constants(&mut self) -> Value {
