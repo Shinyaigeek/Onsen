@@ -34,7 +34,7 @@ impl ValueArray {
     }
 
     pub fn print_value(value: Value) {
-        println!("{:?}", value);
+        print!("{:?}", value);
     }
 }
 

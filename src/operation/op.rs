@@ -14,6 +14,7 @@ pub struct Chunk {
     // the number of elements in the array we have allocated
     capacity: usize,
     constants: ValueArray,
+    lines: Vec<usize>,
 }
 
 impl Chunk {
@@ -23,22 +24,20 @@ impl Chunk {
             count: 0,
             capacity: 0,
             constants: ValueArray::new(),
+            lines: Vec::with_capacity(0),
         }
     }
 
-    pub fn write(&mut self, bytes: OperationCode) {
+    pub fn write(&mut self, bytes: OperationCode, line: usize) {
         if self.count >= self.capacity {
             let old_capacity = self.capacity;
             self.capacity = grow_capacity(self.capacity);
-            self.code = grow_array(
-                // TODO fixme, rethink about memory
-                &mut self.code,
-                self.capacity,
-                old_capacity,
-            );
+            self.code = grow_array(&mut self.code, self.capacity, old_capacity);
+            self.lines = grow_array(&mut self.lines, self.capacity, old_capacity);
         }
 
         self.code.push(bytes);
+        self.lines.push(line);
         self.count += 1;
     }
 
@@ -61,6 +60,39 @@ impl Chunk {
 
     fn disassemble_instruction(&self, offset: &mut usize) {
         print!("{}", format!("{:04} ", offset));
+
+        let cur_code_line = self.lines.get(*offset as usize);
+        let cur_code_line = match cur_code_line {
+            Some(cur_code_line) => cur_code_line,
+            None => {
+                panic!(
+                    "[disassemble_instruction] cur_code_line is none with offset {:?}",
+                    offset
+                )
+            }
+        };
+
+        if *offset > 0 {
+            let prev_code_line_idx = offset.clone() - 1;
+            let prev_code_line = self.lines.get(prev_code_line_idx);
+            let prev_code_line = match prev_code_line {
+                Some(prev_code_line) => prev_code_line,
+                None => {
+                    panic!(
+                        "[disassemble_instruction] prev_code_line is none with offset {:?}",
+                        offset
+                    )
+                }
+            };
+
+            if cur_code_line == prev_code_line {
+                print!("   | ");
+            } else {
+                print!("{}", format!("{:04} ", cur_code_line));
+            }
+        } else {
+            print!("{}", format!("{:04} ", cur_code_line));
+        }
 
         // TODO re thinking
         let instruction = self.code.get(offset.clone());
@@ -95,7 +127,7 @@ impl Chunk {
             }
         };
 
-        println!("{}", format!("{:?} {:04} ", name, constant));
+        print!("{}", format!("{:?} {:04} ", name, constant));
 
         let value = self.constants.values.get(*constant as usize);
         let value = match value {
@@ -132,8 +164,21 @@ mod tests {
         assert_eq!(chunk.capacity, 0);
         assert_eq!(chunk.count, 0);
 
-        chunk.write(OP_RETURN);
+        chunk.write(OP_RETURN, 123);
         assert_eq!(chunk.capacity, 8);
         assert_eq!(chunk.count, 1);
+    }
+
+    #[test]
+    fn write_constant_works() {
+        let mut chunk = Chunk::new();
+        let constant = chunk.add_constants(1.2);
+        assert_eq!(constant, 0);
+        chunk.write(OP_CONSTANT, 123);
+        // TODO re think
+        chunk.write(constant as u8, 123);
+        chunk.write(OP_RETURN, 123);
+        assert_eq!(chunk.constants.count, 1);
+        assert_eq!(chunk.constants.values, vec![1.2]);
     }
 }

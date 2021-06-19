@@ -3,7 +3,7 @@ mod operation;
 
 fn assemble() {
     let mut chunk = Chunk::new();
-    chunk.write(OP_RETURN);
+    chunk.write(OP_RETURN, 123);
     chunk.disassemble("test chunk");
     free_chunk(chunk);
 }
