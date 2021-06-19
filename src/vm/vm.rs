@@ -30,9 +30,15 @@ impl VM {
 
     fn run(&mut self) -> InterpretResult {
         loop {
+            let chunk = match &self.chunk {
+                Some(chunk) => chunk,
+                None => panic!("[run]run is invoked with self.chunk is none"),
+            };
+            chunk.disassemble_instruction(&mut self.ip_idx.clone());
+
             let byte = match &self.ip {
                 Some(ip) => ip[self.ip_idx],
-                None => panic!("[read_bytes]read_bytes is invoked with self.ip is none"),
+                None => panic!("[run]run is invoked with self.ip is none"),
             };
             match byte {
                 OP_RETURN => return InterpretResult::INTERPRET_OK,

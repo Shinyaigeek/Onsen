@@ -58,7 +58,7 @@ impl Chunk {
         }
     }
 
-    fn disassemble_instruction(&self, offset: &mut usize) {
+    pub fn disassemble_instruction(&self, offset: &mut usize) {
         print!("{}", format!("{:04} ", offset));
 
         let cur_code_line = self.lines.get(*offset as usize);
