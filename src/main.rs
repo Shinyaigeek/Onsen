@@ -1,4 +1,6 @@
-use crate::operation::op::{free_chunk, Chunk, OP_CONSTANT, OP_NEGATIVE, OP_RETURN, OP_ADD, OP_DIVIDE};
+use crate::operation::op::{
+    free_chunk, Chunk, OP_ADD, OP_CONSTANT, OP_DIVIDE, OP_NEGATIVE, OP_RETURN,
+};
 use crate::vm::vm::{free_vm, VM};
 mod operation;
 mod vm;

@@ -1,4 +1,6 @@
-use crate::operation::op::{Chunk, OP_CONSTANT, OP_RETURN};
+use crate::operation::op::{
+    Chunk, OP_ADD, OP_CONSTANT, OP_DIVIDE, OP_MULTIPLY, OP_NEGATIVE, OP_RETURN, OP_SUBTRACT,
+};
 use crate::operation::value::{Value, ValueArray};
 
 const STACK_MAX: usize = 256;
@@ -29,7 +31,6 @@ impl VM {
     }
     pub fn interpret(&mut self, chunk: Chunk) -> InterpretResult {
         let code = chunk.code.clone();
-        println!("code: {:?}", code);
         // TODO
         // store the chunk which will be executed by this vm
         self.chunk = Some(chunk);
