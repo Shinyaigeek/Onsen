@@ -34,7 +34,7 @@ impl VM {
         // TODO
         // store the chunk which will be executed by this vm
         self.chunk = Some(chunk);
-        // the location of instructions which is executed by this vm, first bytes of chunks
+        // the locati   on of instructions which is executed by this vm, first bytes of chunks
         self.ip = Some(code);
         self.ip_idx = 0;
         self.run()
@@ -148,8 +148,37 @@ const INTERPRET_OK: &str = "INTERPRET_OK";
 const INTERPRET_COMPILE_ERROR: &str = "INTERPRET_COMPILE_ERROR";
 const INTERPRET_RUNTIME_ERROR: &str = "INTERPRET_RUNTIME_ERROR";
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum InterpretResult {
     INTERPRET_OK,
     INTERPRET_COMPILE_ERROR,
     INTERPRET_RUNTIME_ERROR,
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn test_simple_arithmetic_operation() {
+        let dummy_code_line = 123;
+        let mut vm = VM::new();
+        let mut chunk = Chunk::new();
+
+        let constant = chunk.add_constants(2.0);
+        chunk.write(OP_CONSTANT, dummy_code_line.clone());
+        chunk.write(constant as u8, dummy_code_line.clone());
+
+        let constant = chunk.add_constants(4.0);
+        chunk.write(OP_CONSTANT, dummy_code_line.clone());
+        chunk.write(constant as u8, dummy_code_line.clone());
+        chunk.write(OP_ADD, dummy_code_line.clone());
+
+        let constant = chunk.add_constants(3.0);
+        chunk.write(OP_CONSTANT, dummy_code_line.clone());
+        chunk.write(constant as u8, dummy_code_line.clone());
+
+        chunk.write(OP_RETURN, dummy_code_line.clone());
+
+        assert_eq!(vm.interpret(chunk), InterpretResult::INTERPRET_OK);
+    }
 }
