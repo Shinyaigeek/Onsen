@@ -3,6 +3,7 @@ use crate::operation::op::{
 };
 use crate::vm::vm::{free_vm, VM};
 mod operation;
+mod utils;
 mod vm;
 
 fn main() {
