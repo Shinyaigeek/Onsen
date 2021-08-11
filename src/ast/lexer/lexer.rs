@@ -103,3 +103,57 @@ impl Lexer {
         }
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_read() {
+        let input = "1 2 3".to_string();
+        let mut lexer = Lexer::new(&input);
+        assert_eq!(lexer.read_char(), b'1');
+        lexer.eat_white_space();
+        assert_eq!(lexer.read_char(), b'2');
+        lexer.eat_white_space();
+        assert_eq!(lexer.read_char(), b'3');
+        lexer.eat_white_space();
+        assert_eq!(lexer.read_char(), 0);
+    }
+
+    #[test]
+    fn test_peek() {
+        let input = "1 2 3".to_string();
+        let mut lexer = Lexer::new(&input);
+        assert_eq!(lexer.read_char(), b'1');
+        lexer.eat_white_space();
+        assert_eq!(lexer.peek(), b'2');
+        assert_eq!(lexer.read_char(), b'2');
+    }
+
+    #[test]
+    fn test_read_identifier() {
+        let input = "foo 1 bar".to_string();
+        let mut lexer = Lexer::new(&input);
+        assert_eq!(lexer.read_identifier(), "foo");
+        lexer.eat_white_space();
+        lexer.read_number();
+        lexer.eat_white_space();
+        assert_eq!(lexer.read_identifier(), "bar");
+    }
+
+    #[test]
+    fn test_read_number() {
+        let input = "1 2.3".to_string();
+        let mut lexer = Lexer::new(&input);
+        assert_eq!(
+            lexer.read_number().to_string(),
+            Number::from_str("1".to_string()).to_string()
+        );
+        lexer.eat_white_space();
+        assert_eq!(
+            lexer.read_number().to_string(),
+            Number::from_str("2.3".to_string()).to_string()
+        );
+    }
+}
