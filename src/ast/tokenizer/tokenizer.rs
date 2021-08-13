@@ -281,3 +281,25 @@ impl Tokens {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_simple_tokenizer() {
+        let input = "let x = 5;";
+        let mut lexer = Lexer::new(&input.to_string());
+        let mut tokens = Tokens::new(lexer);
+
+        assert_eq!(
+            tokens.read_token().clone(),
+            Token::__raw_new_(TokenType::IDENTIFIER, String::from("x"))
+        );
+
+        assert_eq!(
+            tokens.read_token().clone(),
+            Token::__raw_new_(TokenType::ASSIGN, String::from("="))
+        );
+    }
+}
