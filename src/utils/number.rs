@@ -48,6 +48,13 @@ impl Number {
             Self::int(i) => i as f64,
         }
     }
+
+    pub fn is_float(self: Self) -> bool {
+        match self {
+            Self::float(f) => true,
+            Self::int(i) => false,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -97,5 +104,14 @@ mod test {
     fn test_to_float() {
         let n = Number::float(1.23);
         assert_eq!(n.to_float(), 1.23);
+    }
+
+    #[test]
+    fn test_is_float() {
+        let n = Number::float(1.23);
+        assert!(n.is_float());
+
+        let n = Number::int(123);
+        assert!(!n.is_float());
     }
 }
