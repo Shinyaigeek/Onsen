@@ -1,5 +1,6 @@
 use crate::utils::number::Number;
 
+#[derive(Debug, PartialEq)]
 pub struct Lexer {
     input: String,
     position: usize,
