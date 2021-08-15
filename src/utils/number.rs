@@ -49,10 +49,17 @@ impl Number {
         }
     }
 
-    pub fn is_float(self: Self) -> bool {
+    pub fn is_float(&self) -> bool {
         match self {
             Self::float(f) => true,
             Self::int(i) => false,
+        }
+    }
+
+    pub fn clone(&self) -> Self {
+        match self {
+            Self::float(f) => Self::float(f.clone()),
+            Self::int(i) => Self::int(i.clone()),
         }
     }
 }
